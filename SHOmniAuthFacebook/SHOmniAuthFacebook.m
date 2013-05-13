@@ -10,6 +10,7 @@
 #import "SHOmniAuthFacebook.h"
 #import "SHOmniAuth.h"
 #import "SHOmniAuthProviderPrivates.h"
+#import <Accounts/Accounts.h>
 
 
 #import "AFOAuth1Client.h"
@@ -30,13 +31,13 @@
 
 +(void)performLoginWithListOfAccounts:(SHOmniAuthAccountsListHandler)accountPickerBlock
                            onComplete:(SHOmniAuthAccountResponseHandler)completionBlock; {
-  SHAccountStore * store = [[SHAccountStore alloc] init];
-  SHAccountType  * type = [store accountTypeWithAccountTypeIdentifier:self.accountTypeIdentifier];
+  ACAccountStore * store = [[ACAccountStore alloc] init];
+  ACAccountType  * type = [store accountTypeWithAccountTypeIdentifier:self.accountTypeIdentifier];
   
   accountPickerBlock([store accountsWithAccountType:type], ^(id<account> theChosenAccount) {
     
     if(theChosenAccount == nil) [self performLoginForNewAccount:completionBlock];
-    else [SHOmniAuthFacebook updateAccount:(SHAccount *)theChosenAccount withCompleteBlock:completionBlock];
+    else [SHOmniAuthFacebook updateAccount:(ACAccount *)theChosenAccount withCompleteBlock:completionBlock];
     
   });
   
@@ -48,8 +49,8 @@
 
 
 +(BOOL)hasLocalAccountOnDevice; {
-  SHAccountStore * store = [[SHAccountStore alloc] init];
-  SHAccountType  * type  = [store accountTypeWithAccountTypeIdentifier:self.accountTypeIdentifier];
+  ACAccountStore * store = [[ACAccountStore alloc] init];
+  ACAccountType  * type  = [store accountTypeWithAccountTypeIdentifier:self.accountTypeIdentifier];
   return [store accountsWithAccountType:type].count > 0;
 }
 +(NSString *)provider; {
@@ -69,9 +70,9 @@
 }
 
 +(void)performLoginForNewAccount:(SHOmniAuthAccountResponseHandler)completionBlock;{
-  SHAccountStore * store    = [[SHAccountStore alloc] init];
-  SHAccountType  * type     = [store accountTypeWithAccountTypeIdentifier:self.accountTypeIdentifier];
-  SHAccount      * account  = [[SHAccount alloc] initWithAccountType:type];
+  ACAccountStore * store    = [[ACAccountStore alloc] init];
+  ACAccountType  * type     = [store accountTypeWithAccountTypeIdentifier:self.accountTypeIdentifier];
+  ACAccount      * account  = [[ACAccount alloc] initWithAccountType:type];
   AFOAuth1Client *  client = [[AFOAuth1Client alloc]
                                               initWithBaseURL:
                                               [NSURL URLWithString:@"http://www.flickr.com/services"]
@@ -90,24 +91,14 @@
                                                                         forProvider:self.provider]
                                                   success:^(AFOAuth1Token *accessToken, id responseObject) {
                                                     
-                                                    
-                                                    NSString     * response      = nil;
-                                                    if(responseObject)
-                                                      response = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
-                                                    NSDictionary * responseDict = nil;
-                                                    if(response)
-                                                      responseDict = [NSURL ab_parseURLQueryString:response];
 
                                                     
 
-                                                    SHAccountCredential * credential = [[SHAccountCredential alloc]
+                                                    ACAccountCredential * credential = [[ACAccountCredential alloc]
                                                                                    initWithOAuthToken:accessToken.key
                                                                                    tokenSecret:accessToken.secret];
                                                
                                                     account.credential = credential;
-                                                    account.username = responseDict[@"username"];
-                                                    account.identifier = responseDict[@"user_nsid"];
-                                                    
                                                [SHOmniAuthFacebook updateAccount:account withCompleteBlock:completionBlock];
                                                
                                              } failure:^(NSError *error) {
@@ -117,9 +108,9 @@
 }
 
 
-+(void)updateAccount:(SHAccount *)theAccount withCompleteBlock:(SHOmniAuthAccountResponseHandler)completeBlock; {
-  SHAccountStore * accountStore = [[SHAccountStore alloc] init];
-  SHAccountType  * accountType  = [accountStore accountTypeWithAccountTypeIdentifier:self.accountTypeIdentifier];
++(void)updateAccount:(ACAccount *)theAccount withCompleteBlock:(SHOmniAuthAccountResponseHandler)completeBlock; {
+  ACAccountStore * accountStore = [[ACAccountStore alloc] init];
+  ACAccountType  * accountType  = [accountStore accountTypeWithAccountTypeIdentifier:self.accountTypeIdentifier];
   [accountStore requestAccessToAccountsWithType:accountType options:nil completion:^(BOOL granted, NSError *error) {
     if(granted) {
       
