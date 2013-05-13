@@ -36,6 +36,8 @@
 
   
   [FBSession.activeSession closeAndClearTokenInformation];
+
+  
   NSString * permission = [SHOmniAuth providerValue:SHOmniAuthProviderValueKey forProvider:self.provider];
   NSArray  * permissionList = nil;
   if(permission.length > 0)
@@ -155,8 +157,8 @@
                                                         JSONObjectWithData:responseData
                                                         options:NSJSONReadingAllowFragments
                                                         error:nil] mutableCopy];
-                      authHash[@"token"] = theAccount.credential.oauthToken;
-                      completeBlock(((id<account>)theAccount),
+                      authHash[@"token"] = account.credential.oauthToken;
+                      completeBlock(((id<account>)account),
                                     [self authHashWithResponse:authHash],
                                     error, NO);
                     }
