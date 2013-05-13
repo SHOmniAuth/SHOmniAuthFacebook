@@ -136,14 +136,12 @@
       account = obj;
       stop = YES;
     }
-    
-    
   }];
     [accountStore renewCredentialsForAccount:account completion:^(ACAccountCredentialRenewResult renewResult, NSError *error) {
             if(renewResult == ACAccountCredentialRenewResultRenewed && error == nil) {
 
               [accountStore saveAccount:account withCompletionHandler:^(BOOL success, NSError *error) {
-                if([error.domain isEqualToString:ACErrorDomain] && error.code ==ACErrorAccountAlreadyExists) {
+                if(([error.domain isEqualToString:ACErrorDomain] && error.code ==ACErrorAccountAlreadyExists) || success || error == nil) {
                   SLRequest * request = [SLRequest requestForServiceType:self.serviceType
                                                            requestMethod:SLRequestMethodGET
                                                                      URL:[NSURL URLWithString:@"https://graph.facebook.com/me/"]
@@ -158,12 +156,17 @@
                                                         options:NSJSONReadingAllowFragments
                                                         error:nil];
                       authHash[@"token"] = theAccount.credential.oauthToken;
-                      completeBlock(((id<account>)theAccount), [self authHashWithResponse:authHash], error, NO);
-                    }                  }];
+                      completeBlock(((id<account>)theAccount),
+                                    [self authHashWithResponse:authHash],
+                                    error, NO);
+                    }
+                  }];
 
                 }
-                
+                else
+                completeBlock(((id<account>)account), nil, error, success);
               }];
+              
             }
             else {
               completeBlock(((id<account>)account), nil, error, NO);
