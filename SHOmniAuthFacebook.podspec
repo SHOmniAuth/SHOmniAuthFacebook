@@ -20,6 +20,4 @@ Pod::Spec.new do |s|
 
   s.dependency  'AFOAuth1Client',         '~> 0.2.0'
   s.dependency  'SHOmniAuth',             '~> 0.1.0'
-  s.dependency  'SHAccountStore',         '~> 0.1.0'
-  s.dependency  'SHRequest',              '~> 0.1.0'
 end
