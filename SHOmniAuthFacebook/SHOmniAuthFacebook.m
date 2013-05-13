@@ -35,7 +35,6 @@
                            onComplete:(SHOmniAuthAccountResponseHandler)completionBlock; {
 
   
-  [FBSession.activeSession closeAndClearTokenInformation];
 
   
   NSString * permission = [SHOmniAuth providerValue:SHOmniAuthProviderValueKey forProvider:self.provider];
