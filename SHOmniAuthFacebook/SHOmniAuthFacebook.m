@@ -151,10 +151,10 @@
                     
                     if(error) completeBlock(((id<account>)account), nil, error, NO);
                     else {
-                      NSMutableDictionary * authHash = [NSJSONSerialization
+                      NSMutableDictionary * authHash = [[NSJSONSerialization
                                                         JSONObjectWithData:responseData
                                                         options:NSJSONReadingAllowFragments
-                                                        error:nil];
+                                                        error:nil] mutableCopy];
                       authHash[@"token"] = theAccount.credential.oauthToken;
                       completeBlock(((id<account>)theAccount),
                                     [self authHashWithResponse:authHash],
