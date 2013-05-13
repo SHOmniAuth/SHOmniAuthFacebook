@@ -9,7 +9,6 @@
 #import "SHAppDelegate.h"
 #import "SHOmniAuth.h"
 #import "SHOmniAuthFacebook.h"
-#import "AFOAuth1Client.h"
 #import "LUKeychainAccess.h"
 
 @implementation SHAppDelegate
@@ -19,7 +18,7 @@
 //  [keychain setObject:@{} forKey:@"kAccountStoreDicitonaryKey"];
 
   [SHOmniAuth registerProvidersWith:^(SHOmniAuthProviderBlock provider) {
-    provider(SHOmniAuthFacebook.provider, @"f104eee60b4bd006f8acc152239df057", @"2dc8ceef3af6cec2", nil, @"flickr://success");
+    provider(SHOmniAuthFacebook.provider, @"165671656932632", @"c518175cdd2321cf82ebf29628022aff", nil, @"");
   }];
   return YES;
 }
@@ -29,12 +28,7 @@
  sourceApplication:(NSString *)sourceApplication
         annotation:(id)annotation; {
   
-  
-  NSNotification *notification = [NSNotification notificationWithName:kAFApplicationLaunchedWithURLNotification object:nil userInfo:[NSDictionary dictionaryWithObject:url forKey:kAFApplicationLaunchOptionsURLKey]];
-  [[NSNotificationCenter defaultCenter] postNotification:notification];
-  
-  
-  return YES;
+  return [SHOmniAuthFacebook handlesOpenUrl:url];
 }
 							
 -(void)applicationWillResignActive:(UIApplication *)application; {

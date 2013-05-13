@@ -4,17 +4,21 @@ PODS:
   - Facebook-iOS-SDK (3.2.1)
   - libffi (3.0.11)
   - LUKeychainAccess (1.0.1)
-  - SHOmniAuth (0.1.1):
+  - SHOmniAuth (0.2.0):
     - LUKeychainAccess
   - SHOmniAuthFacebook (0.1.0):
     - Facebook-iOS-SDK (~> 3.2.1)
-    - SHOmniAuth (~> 0.1.0)
+    - SHOmniAuth (~> 0.2.0)
 
 DEPENDENCIES:
   - BlocksKit
+  - SHOmniAuth (from `http://github.com/seivan/SHOmniAuth`, branch `develop`)
   - SHOmniAuthFacebook (from `../`)
 
 EXTERNAL SOURCES:
+  SHOmniAuth:
+    :branch: :develop
+    :git: http://github.com/seivan/SHOmniAuth
   SHOmniAuthFacebook:
     :path: ../
 
@@ -23,7 +27,7 @@ SPEC CHECKSUMS:
   Facebook-iOS-SDK: 514dc0d7d43358999267c88c088e4b5b339b7da1
   libffi: 8a1d9ba43c0c84b546b42c6f742714e73aa07ae1
   LUKeychainAccess: 6ba22b2e1eec24f9f2fc9c6a9087d5524a58b1a2
-  SHOmniAuth: afd6278ea528acc0569bdee94c2185b03457b357
-  SHOmniAuthFacebook: b22b9147eaf7744436b654f77fbb67fdf1985010
+  SHOmniAuth: 8d1d51375baba5eb78d9054df17737ea7e16aa97
+  SHOmniAuthFacebook: 87d0dd9b583f94845f988b131950488bc93cd3ca
 
 COCOAPODS: 0.19.1

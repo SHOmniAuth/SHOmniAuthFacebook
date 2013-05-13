@@ -19,7 +19,7 @@
 
 -(void)viewDidAppear:(BOOL)animated; {
   [super viewDidAppear:animated];
-  [SHOmniAuthFacebook performLoginWithListOfAccounts:^(NSArray *accounts, SHOmniAuthAccountPickerHandler pickAccountBlock) { UIActionSheet * actionSheet = [[UIActionSheet alloc] initWithTitle:@"Pick Flickr account"];
+  [SHOmniAuthFacebook performLoginWithListOfAccounts:^(NSArray *accounts, SHOmniAuthAccountPickerHandler pickAccountBlock) { UIActionSheet * actionSheet = [[UIActionSheet alloc] initWithTitle:@"Pick Facebook account"];
     [accounts each:^(id<account> account) {
       [actionSheet addButtonWithTitle:account.username handler:^{
         pickAccountBlock(account);
@@ -30,7 +30,7 @@
     if(accounts.count > 0)
       buttonTitle = @"Add account";
     else
-      buttonTitle = @"Connect with Flickr";
+      buttonTitle = @"Connect with Facebook";
     
     [actionSheet addButtonWithTitle:buttonTitle handler:^{
       pickAccountBlock(nil);

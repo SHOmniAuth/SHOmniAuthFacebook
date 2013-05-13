@@ -10,4 +10,5 @@
 #import "SHOmniAuthProvider.h"
 @interface SHOmniAuthFacebook : NSObject
 <SHOmniAuthProvider>
++(BOOL)handlesOpenUrl:(NSURL *)theUrl;
 @end
