@@ -11,7 +11,7 @@
 #import "SHOmniAuth.h"
 #import "SHOmniAuthProviderPrivates.h"
 #import <Accounts/Accounts.h>
-#import <
+#import <Social/Social.h>
 
 #import "AFOAuth1Client.h"
 
@@ -119,7 +119,7 @@
       NSString * fields = theAccount.identifier;
       NSString * urlString = [NSString stringWithFormat:@"https://www.flickr.com/services/rest/?format=json&method=flickr.people.getInfo&nojsoncallback=1&user_id=%@", fields];
 
-      SHRequest * request=  [SHRequest requestForServiceType:theAccount.accountType.identifier requestMethod:SHRequestMethodGET URL:[NSURL URLWithString:urlString] parameters:nil];
+      SLRequest * request=  [SLRequest requestForServiceType:theAccount.accountType.identifier requestMethod:SLRequestMethodGET URL:[NSURL URLWithString:urlString] parameters:nil];
       request.account = (id<account>)theAccount;
       [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
         NSDictionary * response = nil;
