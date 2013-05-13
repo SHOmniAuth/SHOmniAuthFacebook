@@ -54,8 +54,8 @@
     dispatch_async(dispatch_get_main_queue(), ^{
       
       
-      accountPickerBlock([accountStore accountsWithAccountType:accountType], ^(id<account> theChosenAccount) {
-        
+      accountPickerBlock([accountStore accountsWithAccountType:accountType],
+                         ^(id<account> theChosenAccount) {
         ACAccount * account = (ACAccount *)theChosenAccount;
         if(theChosenAccount == nil) [self performLoginForNewAccount:completionBlock];
         else [SHOmniAuthFacebook updateAccount:(ACAccount *)account withCompleteBlock:completionBlock];
@@ -103,9 +103,10 @@
   [FBSession openActiveSessionWithReadPermissions:@[@"email"]
                                      allowLoginUI:YES
                                 completionHandler:^(FBSession *session, FBSessionState status, NSError *error) {
-                                  
 
-                                  if(status == FBSessionStateOpen)
+                                  if (status == FBSessionStateClosed || status == FBSessionStateClosedLoginFailed || error )
+                                    completionBlock(nil, nil, error, NO);
+                                  else {
                                     [[FBRequest requestForMe] startWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
                                       if(error)
                                         completionBlock(nil, nil, error, NO);
@@ -113,12 +114,10 @@
                                         [result setObject:session.accessTokenData.accessToken forKey:@"token"];
                                         completionBlock(nil,[SHOmniAuthFacebook authHashWithResponse:result],error,YES);
                                       }
-                                     
                                       
                                     }];
 
-                                  else if (status == FBSessionStateClosed || status == FBSessionStateClosedLoginFailed || error )
-                                    completionBlock(nil, nil, error, NO);
+                                  }
 
                                 }];
                                   
@@ -126,57 +125,50 @@
   
 }
 
-
+//Refactor this fucking monster
 +(void)updateAccount:(ACAccount *)theAccount withCompleteBlock:(SHOmniAuthAccountResponseHandler)completeBlock; {
   ACAccountStore * accountStore = [[ACAccountStore alloc] init];
   ACAccountType  * accountType  = [accountStore accountTypeWithAccountTypeIdentifier:self.accountTypeIdentifier];
 
-  theAccount = accountStore.accounts[0];
-    [accountStore renewCredentialsForAccount:theAccount completion:^(ACAccountCredentialRenewResult renewResult, NSError *error) {
+  __block ACAccount * account = nil;
+  [accountStore.accounts enumerateObjectsUsingBlock:^(ACAccount * obj, NSUInteger _, BOOL *stop) {
+    if([obj.username isEqualToString:theAccount.username]) {
+      account = obj;
+      stop = YES;
+    }
+    
+    
+  }];
+    [accountStore renewCredentialsForAccount:account completion:^(ACAccountCredentialRenewResult renewResult, NSError *error) {
             if(renewResult == ACAccountCredentialRenewResultRenewed && error == nil) {
-              [accountStore saveAccount:theAccount withCompletionHandler:^(BOOL success, NSError *error) {
-                SLRequest * request = [SLRequest requestForServiceType:self.serviceType requestMethod:SLRequestMethodGET URL:[NSURL URLWithString:@"https://graph.facebook.com/me/"]
-                                                            parameters:nil];
-                request.account = theAccount;
-                [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
-                  NSDictionary * meHash = [NSJSONSerialization JSONObjectWithData:responseData options:NSJSONReadingAllowFragments error:nil];
-                  NSLog(@"%@, %@", meHash, theAccount.credential.oauthToken);
-                  
-                }];
 
+              [accountStore saveAccount:account withCompletionHandler:^(BOOL success, NSError *error) {
+                if([error.domain isEqualToString:ACErrorDomain] && error.code ==ACErrorAccountAlreadyExists) {
+                  SLRequest * request = [SLRequest requestForServiceType:self.serviceType
+                                                           requestMethod:SLRequestMethodGET
+                                                                     URL:[NSURL URLWithString:@"https://graph.facebook.com/me/"]
+                                                              parameters:nil];
+                  request.account = account;
+                  [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
+                    
+                    if(error) completeBlock(((id<account>)account), nil, error, NO);
+                    else {
+                      NSMutableDictionary * authHash = [NSJSONSerialization
+                                                        JSONObjectWithData:responseData
+                                                        options:NSJSONReadingAllowFragments
+                                                        error:nil];
+                      authHash[@"token"] = theAccount.credential.oauthToken;
+                      completeBlock(((id<account>)theAccount), [self authHashWithResponse:authHash], error, NO);
+                    }                  }];
+
+                }
+                
               }];
             }
             else {
+              completeBlock(((id<account>)account), nil, error, NO);
             }
     }];
-//  NSString * fields = theAccount.identifier;
-//      NSString * urlString = [NSString stringWithFormat:@"https://www.flickr.com/services/rest/?format=json&method=flickr.people.getInfo&nojsoncallback=1&user_id=%@", fields];
-//
-//      SLRequest * request=  [SLRequest requestForServiceType:theAccount.accountType.identifier requestMethod:SLRequestMethodGET URL:[NSURL URLWithString:urlString] parameters:nil];
-//      request.account = (id<account>)theAccount;
-//      [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
-//        NSDictionary * response = nil;
-//        if(responseData) response =  [NSJSONSerialization JSONObjectWithData:responseData options:0 error:nil];
-//        
-//        if(error || [response[@"status"] integerValue] == 400 ){
-//          dispatch_async(dispatch_get_main_queue(), ^{ completeBlock(nil, nil, error, NO); });
-//          return;
-//        }
-//        
-  
-                
-        [accountStore saveAccount:theAccount withCompletionHandler:^(BOOL success, NSError *error) {
-//          NSMutableDictionary * fullResponse = response.mutableCopy;
-          id<accountPrivate> privateAccount = (id<accountPrivate>)theAccount;
-//          fullResponse[@"oauth_token"]        = privateAccount.credential.token;
-//          fullResponse[@"oauth_token_secret"] = privateAccount.credential.secret;
-
-        }];
-        
-//    else
-//      dispatch_async(dispatch_get_main_queue(), ^{ completeBlock((id<account>)theAccount, nil, error, granted); });
-  
-//  }];
   
 }
 
