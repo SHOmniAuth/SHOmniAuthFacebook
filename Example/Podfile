@@ -1,4 +1,4 @@
 platform :ios, '5.0' 
-pod 'SHOmniAuth',	  :git => "http://github.com/seivan/SHOmniAuth", :branch => :develop
+#pod 'SHOmniAuth',	  :git => "http://github.com/seivan/SHOmniAuth", :branch => :develop
 pod 'SHOmniAuthFacebook', :path => '../'
 pod 'BlocksKit'
