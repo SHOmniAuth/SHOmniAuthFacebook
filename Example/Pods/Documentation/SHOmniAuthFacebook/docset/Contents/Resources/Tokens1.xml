@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Tokens version="1.0">
+	<File path="Classes/SHOmniAuthFlickr.html">
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/cl/SHOmniAuthFlickr</TokenIdentifier>
+			<Abstract type="html"></Abstract>
+			<DeclaredIn>SHOmniAuthFlickr.h</DeclaredIn>
+			
+			<NodeRef refid="1"/>
+		</Token>
+		
+		
+	</File>
+</Tokens>

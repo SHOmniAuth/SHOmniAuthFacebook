@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DocSetNodes version="1.0">
+    <TOC>
+        <Node type="folder">
+            <Name>SHOmniAuthFlickr 0.1.0</Name>
+            <Path>index.html</Path>
+			<Subnodes>
+                
+				
+				<Node type="folder">
+					<Name>Classes</Name>
+					<Path>index.html</Path>
+					<Subnodes>
+						<NodeRef refid="1"/>
+						
+					</Subnodes>
+				</Node>
+				
+				
+				
+			</Subnodes>
+        </Node>
+    </TOC>
+	<Library>
+		
+		<Node id="1">
+			<Name>SHOmniAuthLinkedIn</Name>
+			<Path>Classes/SHOmniAuthLinkedIn.html</Path>
+		</Node>
+		
+		
+		
+	</Library>
+</DocSetNodes>
