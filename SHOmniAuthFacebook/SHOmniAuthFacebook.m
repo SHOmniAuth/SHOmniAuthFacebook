@@ -57,10 +57,12 @@
 
 +(void)performLoginWithListOfAccounts:(SHOmniAuthAccountsListHandler)accountPickerBlock
                            onComplete:(SHOmniAuthAccountResponseHandler)completionBlock; {
+  [FBSession.activeSession closeAndClearTokenInformation];
   NSDictionary * options = @{ACFacebookAppIdKey : [SHOmniAuth providerValue:SHOmniAuthProviderValueKey forProvider:self.provider],
                              ACFacebookPermissionsKey : @[@"email"],
                              ACFacebookAudienceKey : ACFacebookAudienceEveryone
                              };
+  
 
   ACAccountStore * accountStore = [[ACAccountStore alloc] init];
   ACAccountType  * accountType = [accountStore accountTypeWithAccountTypeIdentifier:self.accountTypeIdentifier];
@@ -127,10 +129,18 @@
                                      allowLoginUI:YES
                                 completionHandler:^(FBSession *session, FBSessionState status, NSError *error) {
                                   
-                                  if (status == FBSessionStateOpen) {
-                                    completionBlock(nil, nil, error, YES);
-                                  }
-                                  
+
+                                  if(status == FBSessionStateOpen)
+                                    [[FBRequest requestForMe] startWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+                                      if(error)
+                                        completionBlock(nil, nil, error, NO);
+                                      else {
+                                        [result setObject:session.accessTokenData.accessToken forKey:@"token"];
+                                        completionBlock(nil,[SHOmniAuthFacebook authHashWithResponse:result],error,YES);
+                                      }
+                                     
+                                      
+                                    }];
 
                                   else if (status == FBSessionStateClosed || status == FBSessionStateClosedLoginFailed || error )
                                     completionBlock(nil, nil, error, NO);
@@ -179,25 +189,25 @@
 }
 
 +(NSMutableDictionary *)authHashWithResponse:(NSDictionary *)theResponse; {
-  NSString * name      = theResponse[@"person"][@"realname"][@"_content"];
+  NSString * name      = theResponse[@"name"];
   NSArray  * names     = [name componentsSeparatedByString:@" "];
-  NSString * firstName = nil;
-  NSString * lastName  = nil;
-  if(names.count > 0)
+  NSString * firstName = theResponse[@"first_name"];
+  NSString * lastName  = theResponse[@"last_name"];
+  if(names.count > 0 && firstName == nil)
     firstName = names[0];
-  if(names.count > 1)
+  if(names.count > 1 && lastName == nil)
     lastName = names[1];
-  if(names.count > 2)
+  if(names.count > 2  && lastName == nil)
     lastName = names[names.count-1];
   
     
     
   NSMutableDictionary * omniAuthHash = @{@"auth" :
                                   @{@"credentials" : @{@"secret" : NSNullIfNil(theResponse[@"oauth_token_secret"]),
-                                                     @"token"  : NSNullIfNil(theResponse[@"oauth_token"])
+                                                       @"token"  : NSNullIfNil(theResponse[@"token"])
                                                      }.mutableCopy,
                                   
-                                  @"info" : @{@"description"  : NSNullIfNil(theResponse[@"person"][@"description"][@"_content"]),
+                                  @"info" : @{@"description"  : NSNullIfNil(theResponse[@"description"]),
                                               @"email"        : NSNullIfNil(theResponse[@"email"]),
                                               @"first_name"   : NSNullIfNil(firstName),
                                               @"last_name"    : NSNullIfNil(lastName),
@@ -205,12 +215,12 @@
                                               @"industry"     : NSNullIfNil(theResponse[@"industry"]),
                                               @"image"        : NSNullIfNil(theResponse[@"profile_image_url"]),
                                               @"name"         : NSNullIfNil(name),
-                                              @"urls"         : @{@"public_profile" : NSNullIfNil(theResponse[@"person"][@"profileurl"][@"_content"])
+                                              @"urls"         : @{@"public_profile" : NSNullIfNil(theResponse[@"link"])
                                                                   }.mutableCopy,
                                               
                                               }.mutableCopy,
-                                  @"provider" : @"flickr",
-                                  @"uid"      : NSNullIfNil(theResponse[@"person"][@"nsid"]),
+                                  @"provider" : @"facebook",
+                                  @"uid"      : NSNullIfNil(theResponse[@"id"]),
                                   @"raw_info" : NSNullIfNil(theResponse)
                                     }.mutableCopy,
                                   @"email"    : NSNullIfNil(theResponse[@"email"]),
