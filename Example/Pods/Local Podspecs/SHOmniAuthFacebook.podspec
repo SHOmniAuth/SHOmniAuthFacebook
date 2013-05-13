@@ -1,11 +1,11 @@
 Pod::Spec.new do |s|
   s.name         = "SHOmniAuthFacebook"
   s.version      = "0.1.0"
-  s.summary      = "Facebook Strategy for SHOmniAuth, uses SHAccountStore and SHRequest."
+  s.summary      = "Facebook Strategy for SHOmniAuth."
 
   s.description  = <<-DESC
                     A strategy for authenticating with Facebook via SHOmniAuth.
-                    Uses SHAccountStore for store and SHRequest for signed requests.
+                    Uses ACAccount for store and SLRequest for signed requests.
                    DESC
   s.homepage     = "https://github.com/seivan/SHOmniAuthFacebook"
 
@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
   s.requires_arc = true
   s.frameworks   = 'Accounts', 'Social'
 
-  #s.dependency 'AFOAuth1Client',   '~> 0.2.0'
+
   s.dependency  'Facebook-iOS-SDK', '~> 3.2.1' 
-  s.dependency  'SHOmniAuth',       '~> 0.2.0'
+  s.dependency  'SHOmniAuth',       '~> 0.1.0'
 end
