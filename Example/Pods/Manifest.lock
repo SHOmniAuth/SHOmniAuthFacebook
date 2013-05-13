@@ -2,6 +2,9 @@ PODS:
   - AFNetworking (1.2.1)
   - AFOAuth1Client (0.2.0):
     - AFNetworking (>= 1.0)
+  - BlocksKit (1.8.2):
+    - libffi
+  - libffi (3.0.11)
   - LUKeychainAccess (1.0.1)
   - SHOmniAuth (0.1.1):
     - LUKeychainAccess
@@ -10,6 +13,7 @@ PODS:
     - SHOmniAuth (~> 0.1.0)
 
 DEPENDENCIES:
+  - BlocksKit
   - SHOmniAuthFacebook (from `../`)
 
 EXTERNAL SOURCES:
@@ -19,6 +23,8 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   AFNetworking: 616da0028916ce296f5c3cef74e5552eb4e10e13
   AFOAuth1Client: 3e01e6e4218116c2e279671c8ab086133514a350
+  BlocksKit: 7396526b0816734103f6133fbb1a520c8b04e80c
+  libffi: 8a1d9ba43c0c84b546b42c6f742714e73aa07ae1
   LUKeychainAccess: 6ba22b2e1eec24f9f2fc9c6a9087d5524a58b1a2
   SHOmniAuth: afd6278ea528acc0569bdee94c2185b03457b357
   SHOmniAuthFacebook: 79c8b0b25f4130c31df5c198ac4dca6ac950dd6e
