@@ -19,6 +19,7 @@ Pod::Spec.new do |s|
   s.requires_arc = true
   s.frameworks   = 'Accounts', 'Social'
 
-  s.dependency  'AFOAuth1Client',         '~> 0.2.0'
-  s.dependency  'SHOmniAuth',             '~> 0.1.0'
+  #s.dependency 'AFOAuth1Client',   '~> 0.2.0'
+  s.dependency  'Facebook-iOS-SDK', '~> 3.2.1' 
+  s.dependency  'SHOmniAuth',       '~> 0.1.0'
 end

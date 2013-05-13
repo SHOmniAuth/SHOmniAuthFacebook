@@ -13,7 +13,7 @@
 #import <Accounts/Accounts.h>
 #import <Social/Social.h>
 
-#import "AFOAuth1Client.h"
+//#import "AFOAuth1Client.h"
 
 #define NSNullIfNil(v) (v ? v : [NSNull null])
 
