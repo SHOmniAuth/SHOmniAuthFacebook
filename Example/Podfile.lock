@@ -12,13 +12,9 @@ PODS:
 
 DEPENDENCIES:
   - BlocksKit
-  - SHOmniAuth (from `http://github.com/seivan/SHOmniAuth`, branch `develop`)
   - SHOmniAuthFacebook (from `../`)
 
 EXTERNAL SOURCES:
-  SHOmniAuth:
-    :branch: :develop
-    :git: http://github.com/seivan/SHOmniAuth
   SHOmniAuthFacebook:
     :path: ../
 
