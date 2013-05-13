@@ -15,34 +15,10 @@
 #import <FacebookSDK/FacebookSDK.h>
 
 
-//#import "AFOAuth1Client.h"
+
+
 
 #define NSNullIfNil(v) (v ? v : [NSNull null])
-
-@interface SHOmniAuthFacebookManager : NSObject
-+(instancetype)sharedManager;
-@end
-
-@implementation SHOmniAuthFacebookManager
-
-#pragma mark -
-#pragma mark Initialize
--(instancetype)init {
-  self = [super init];
-  if (self) {
-  }
-  
-  return self;
-}
-
-+(instancetype)sharedManager; {
-  static dispatch_once_t once;
-  static SHOmniAuthFacebookManager * sharedManager;
-  dispatch_once(&once, ^ { sharedManager = [[self alloc] init]; });
-  return sharedManager;
-}
-
-@end
 
 
 @interface SHOmniAuthFacebook ()
@@ -57,19 +33,22 @@
 
 +(void)performLoginWithListOfAccounts:(SHOmniAuthAccountsListHandler)accountPickerBlock
                            onComplete:(SHOmniAuthAccountResponseHandler)completionBlock; {
+  NSString * lz = [SHOmniAuth providerValue:SHOmniAuthProviderValueKey forProvider:self.provider];
+  
   [FBSession.activeSession closeAndClearTokenInformation];
-  NSDictionary * options = @{ACFacebookAppIdKey : [SHOmniAuth providerValue:SHOmniAuthProviderValueKey forProvider:self.provider],
+  NSDictionary * options = @{ACFacebookAppIdKey : lz,
                              ACFacebookPermissionsKey : @[@"email"],
                              ACFacebookAudienceKey : ACFacebookAudienceEveryone
                              };
   
-
   ACAccountStore * accountStore = [[ACAccountStore alloc] init];
   ACAccountType  * accountType = [accountStore accountTypeWithAccountTypeIdentifier:self.accountTypeIdentifier];
   [accountStore requestAccessToAccountsWithType:accountType options:options completion:^(BOOL granted, NSError *error) {
-
     dispatch_async(dispatch_get_main_queue(), ^{
-
+      
+      NSArray * lol = [accountStore accountsWithAccountType:accountType];
+      NSArray * lol2 = [accountStore accounts];
+      
       accountPickerBlock([accountStore accountsWithAccountType:accountType], ^(id<account> theChosenAccount) {
     
         if(theChosenAccount == nil) [self performLoginForNewAccount:completionBlock];
@@ -106,7 +85,7 @@
 }
 
 +(NSString *)serviceType; {
-  return ACAccountTypeIdentifierFacebook;
+  return SLServiceTypeFacebook;
 }
 
 +(NSString *)description; {
@@ -156,6 +135,21 @@
   ACAccountStore * accountStore = [[ACAccountStore alloc] init];
   ACAccountType  * accountType  = [accountStore accountTypeWithAccountTypeIdentifier:self.accountTypeIdentifier];
 
+    [accountStore renewCredentialsForAccount:theAccount completion:^(ACAccountCredentialRenewResult renewResult, NSError *error) {
+      if(renewResult == ACAccountCredentialRenewResultRenewed && error == nil) {
+        SLRequest * request = [SLRequest requestForServiceType:self.serviceType requestMethod:SLRequestMethodGET URL:[NSURL URLWithString:@"https://graph.facebook.com/me/"]
+                                                    parameters:nil];
+        request.account = theAccount;
+        [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
+          NSString * response = [[NSString alloc] initWithData:responseData
+                                                      encoding:NSUTF8StringEncoding];
+          
+        }];
+      }
+      else {
+        
+      }
+    }];
 //  NSString * fields = theAccount.identifier;
 //      NSString * urlString = [NSString stringWithFormat:@"https://www.flickr.com/services/rest/?format=json&method=flickr.people.getInfo&nojsoncallback=1&user_id=%@", fields];
 //
@@ -178,7 +172,6 @@
 //          fullResponse[@"oauth_token"]        = privateAccount.credential.token;
 //          fullResponse[@"oauth_token_secret"] = privateAccount.credential.secret;
 
-          dispatch_async(dispatch_get_main_queue(), ^{ completeBlock((id<account>)theAccount, nil, error, success); });
         }];
         
 //    else
