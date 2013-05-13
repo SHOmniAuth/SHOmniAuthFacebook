@@ -10,22 +10,16 @@
 #import "SHOmniAuthFacebook.h"
 #import "SHOmniAuth.h"
 #import "SHOmniAuthProviderPrivates.h"
-#import "OAuthCore.h"
-#import "OAuth+Additions.h"
 
-#import "SHAccountStore.h"
-#import "SHRequest.h"
+
 #import "AFOAuth1Client.h"
 
 #define NSNullIfNil(v) (v ? v : [NSNull null])
 
 
-@interface SHAccount ()
-@property (readwrite, NS_NONATOMIC_IOSONLY) NSString      *identifier;
-@end
 
 @interface SHOmniAuthFacebook ()
-+(void)updateAccount:(SHAccount *)theAccount withCompleteBlock:(SHOmniAuthAccountResponseHandler)completeBlock;
++(void)updateAccount:(ACAccount *)theAccount withCompleteBlock:(SHOmniAuthAccountResponseHandler)completeBlock;
 +(void)performLoginForNewAccount:(SHOmniAuthAccountResponseHandler)completionBlock;
 +(NSMutableDictionary *)authHashWithResponse:(NSDictionary *)theResponse;
 
