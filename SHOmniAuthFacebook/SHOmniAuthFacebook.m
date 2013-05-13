@@ -127,8 +127,10 @@
                                      allowLoginUI:YES
                                 completionHandler:^(FBSession *session, FBSessionState status, NSError *error) {
                                   
-                                  if (status == FBSessionStateOpen)
-                                    completionBlock(nil, nil, error, NO);
+                                  if (status == FBSessionStateOpen) {
+                                    completionBlock(nil, nil, error, YES);
+                                  }
+                                  
 
                                   else if (status == FBSessionStateClosed || status == FBSessionStateClosedLoginFailed || error )
                                     completionBlock(nil, nil, error, NO);
