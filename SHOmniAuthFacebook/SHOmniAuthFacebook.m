@@ -131,22 +131,23 @@
   ACAccountStore * accountStore = [[ACAccountStore alloc] init];
   ACAccountType  * accountType  = [accountStore accountTypeWithAccountTypeIdentifier:self.accountTypeIdentifier];
 
-  SLRequest * request = [SLRequest requestForServiceType:self.serviceType requestMethod:SLRequestMethodGET URL:[NSURL URLWithString:@"https://graph.facebook.com/me/"]
-                                              parameters:nil];
-  request.account = accountStore.accounts[0];
-  [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
-    NSString * response = [[NSString alloc] initWithData:responseData
-                                                encoding:NSUTF8StringEncoding];
-    
-  }];
 
-//    [accountStore renewCredentialsForAccount:theAccount completion:^(ACAccountCredentialRenewResult renewResult, NSError *error) {
-//      if(renewResult == ACAccountCredentialRenewResultRenewed && error == nil) {
-//      }
-//      else {
-//        
-//      }
-//    }];
+    [accountStore renewCredentialsForAccount:accountStore.accounts[0] completion:^(ACAccountCredentialRenewResult renewResult, NSError *error) {
+      if(renewResult == ACAccountCredentialRenewResultRenewed && error == nil) {
+        SLRequest * request = [SLRequest requestForServiceType:self.serviceType requestMethod:SLRequestMethodGET URL:[NSURL URLWithString:@"https://graph.facebook.com/me/"]
+                                                    parameters:nil];
+        request.account = accountStore.accounts[0];
+        [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
+          NSString * response = [[NSString alloc] initWithData:responseData
+                                                      encoding:NSUTF8StringEncoding];
+          
+        }];
+
+      }
+      else {
+        
+      }
+    }];
 //  NSString * fields = theAccount.identifier;
 //      NSString * urlString = [NSString stringWithFormat:@"https://www.flickr.com/services/rest/?format=json&method=flickr.people.getInfo&nojsoncallback=1&user_id=%@", fields];
 //
