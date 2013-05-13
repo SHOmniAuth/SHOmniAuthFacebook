@@ -33,26 +33,32 @@
 
 +(void)performLoginWithListOfAccounts:(SHOmniAuthAccountsListHandler)accountPickerBlock
                            onComplete:(SHOmniAuthAccountResponseHandler)completionBlock; {
-  NSString * lz = [SHOmniAuth providerValue:SHOmniAuthProviderValueKey forProvider:self.provider];
+
   
   [FBSession.activeSession closeAndClearTokenInformation];
-  NSDictionary * options = @{ACFacebookAppIdKey : lz,
-                             ACFacebookPermissionsKey : @[@"email"],
+  NSString * permission = [SHOmniAuth providerValue:SHOmniAuthProviderValueKey forProvider:self.provider];
+  NSArray  * permissionList = nil;
+  if(permission.length > 0)
+    permissionList = [permission componentsSeparatedByString:@","];
+  else
+    permissionList = @[@"email"];
+  NSDictionary * options = @{ACFacebookAppIdKey : [SHOmniAuth providerValue:SHOmniAuthProviderValueKey forProvider:self.provider],
+                             ACFacebookPermissionsKey : permissionList,
                              ACFacebookAudienceKey : ACFacebookAudienceEveryone
                              };
   
   ACAccountStore * accountStore = [[ACAccountStore alloc] init];
   ACAccountType  * accountType = [accountStore accountTypeWithAccountTypeIdentifier:self.accountTypeIdentifier];
   [accountStore requestAccessToAccountsWithType:accountType options:options completion:^(BOOL granted, NSError *error) {
+    
     dispatch_async(dispatch_get_main_queue(), ^{
       
-      NSArray * lol = [accountStore accountsWithAccountType:accountType];
-      NSArray * lol2 = [accountStore accounts];
       
       accountPickerBlock([accountStore accountsWithAccountType:accountType], ^(id<account> theChosenAccount) {
-    
+        
+        ACAccount * account = (ACAccount *)theChosenAccount;
         if(theChosenAccount == nil) [self performLoginForNewAccount:completionBlock];
-        else [SHOmniAuthFacebook updateAccount:(ACAccount *)theChosenAccount withCompleteBlock:completionBlock];
+        else [SHOmniAuthFacebook updateAccount:(ACAccount *)account withCompleteBlock:completionBlock];
     
       });
       
@@ -94,16 +100,6 @@
 
 +(void)performLoginForNewAccount:(SHOmniAuthAccountResponseHandler)completionBlock;{
   
-  ACAccountStore * store    = [[ACAccountStore alloc] init];
-  ACAccountType  * type     = [store accountTypeWithAccountTypeIdentifier:self.accountTypeIdentifier];
-//  ACAccount      * account  = [[ACAccount alloc] initWithAccountType:type];
-  
-//  ACAccountCredential * credential = [[ACAccountCredential alloc]
-//                                      initWithOAuthToken:accessToken.key
-//                                      tokenSecret:accessToken.secret];
-//  
-//  account.credential = credential;
-//  [SHOmniAuthFacebook updateAccount:account withCompleteBlock:completionBlock];
   [FBSession openActiveSessionWithReadPermissions:@[@"email"]
                                      allowLoginUI:YES
                                 completionHandler:^(FBSession *session, FBSessionState status, NSError *error) {
@@ -135,21 +131,22 @@
   ACAccountStore * accountStore = [[ACAccountStore alloc] init];
   ACAccountType  * accountType  = [accountStore accountTypeWithAccountTypeIdentifier:self.accountTypeIdentifier];
 
-    [accountStore renewCredentialsForAccount:theAccount completion:^(ACAccountCredentialRenewResult renewResult, NSError *error) {
-      if(renewResult == ACAccountCredentialRenewResultRenewed && error == nil) {
-        SLRequest * request = [SLRequest requestForServiceType:self.serviceType requestMethod:SLRequestMethodGET URL:[NSURL URLWithString:@"https://graph.facebook.com/me/"]
-                                                    parameters:nil];
-        request.account = theAccount;
-        [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
-          NSString * response = [[NSString alloc] initWithData:responseData
-                                                      encoding:NSUTF8StringEncoding];
-          
-        }];
-      }
-      else {
-        
-      }
-    }];
+  SLRequest * request = [SLRequest requestForServiceType:self.serviceType requestMethod:SLRequestMethodGET URL:[NSURL URLWithString:@"https://graph.facebook.com/me/"]
+                                              parameters:nil];
+  request.account = accountStore.accounts[0];
+  [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
+    NSString * response = [[NSString alloc] initWithData:responseData
+                                                encoding:NSUTF8StringEncoding];
+    
+  }];
+
+//    [accountStore renewCredentialsForAccount:theAccount completion:^(ACAccountCredentialRenewResult renewResult, NSError *error) {
+//      if(renewResult == ACAccountCredentialRenewResultRenewed && error == nil) {
+//      }
+//      else {
+//        
+//      }
+//    }];
 //  NSString * fields = theAccount.identifier;
 //      NSString * urlString = [NSString stringWithFormat:@"https://www.flickr.com/services/rest/?format=json&method=flickr.people.getInfo&nojsoncallback=1&user_id=%@", fields];
 //
