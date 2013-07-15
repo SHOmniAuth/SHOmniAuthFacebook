@@ -6,7 +6,7 @@ PODS:
   - LUKeychainAccess (1.0.1)
   - SHOmniAuth (0.2.1):
     - LUKeychainAccess
-  - SHOmniAuthFacebook (0.2.0):
+  - SHOmniAuthFacebook (0.2.1):
     - Facebook-iOS-SDK (~> 3.2.1)
     - SHOmniAuth (~> 0.2.0)
 
@@ -24,6 +24,6 @@ SPEC CHECKSUMS:
   libffi: 64ef39353e747bb2b25e1026afd96a157bf9231c
   LUKeychainAccess: 6ba22b2e1eec24f9f2fc9c6a9087d5524a58b1a2
   SHOmniAuth: 7274fc4ffa0fbc371e70b668247294a3616a8bfd
-  SHOmniAuthFacebook: ba20d83cf2929c7bc6043e11f3e44dedc717c5f3
+  SHOmniAuthFacebook: 458ac6c397f204f191e90419a664cf04ca05c92b
 
 COCOAPODS: 0.22.2
