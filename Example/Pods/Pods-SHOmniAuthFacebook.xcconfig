@@ -1,0 +1,1 @@
+PODS_SHOMNIAUTHFACEBOOK_OTHER_LDFLAGS = -framework Accounts -framework Social

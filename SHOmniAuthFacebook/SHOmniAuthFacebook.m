@@ -34,10 +34,10 @@
 +(void)performLoginWithListOfAccounts:(SHOmniAuthAccountsListHandler)accountPickerBlock
                            onComplete:(SHOmniAuthAccountResponseHandler)completionBlock; {
 
-  
 
-  
-  NSString * permission = [SHOmniAuth providerValue:SHOmniAuthProviderValueKey forProvider:self.provider];
+
+
+  NSString * permission = [SHOmniAuth providerValue:SHOmniAuthProviderValueScope forProvider:self.provider];
   NSArray  * permissionList = nil;
   if(permission.length > 0)
     permissionList = [permission componentsSeparatedByString:@","];
@@ -47,29 +47,21 @@
                              ACFacebookPermissionsKey : permissionList,
                              ACFacebookAudienceKey : ACFacebookAudienceEveryone
                              };
-  
+
   ACAccountStore * accountStore = [[ACAccountStore alloc] init];
   ACAccountType  * accountType = [accountStore accountTypeWithAccountTypeIdentifier:self.accountTypeIdentifier];
   [accountStore requestAccessToAccountsWithType:accountType options:options completion:^(BOOL granted, NSError *error) {
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
-      
-      
       accountPickerBlock([accountStore accountsWithAccountType:accountType],
                          ^(id<account> theChosenAccount) {
         ACAccount * account = (ACAccount *)theChosenAccount;
         if(theChosenAccount == nil) [self performLoginForNewAccount:completionBlock];
         else [SHOmniAuthFacebook updateAccount:(ACAccount *)account withCompleteBlock:completionBlock];
-    
       });
-      
     });
+
   }];
-  
-  
-  
-  
-  
 }
 
 
@@ -100,7 +92,7 @@
 }
 
 +(void)performLoginForNewAccount:(SHOmniAuthAccountResponseHandler)completionBlock;{
-  
+
   [FBSession openActiveSessionWithReadPermissions:@[@"email"]
                                      allowLoginUI:YES
                                 completionHandler:^(FBSession *session, FBSessionState status, NSError *error) {
@@ -115,15 +107,15 @@
                                         [result setObject:session.accessTokenData.accessToken forKey:@"token"];
                                         completionBlock(nil,[SHOmniAuthFacebook authHashWithResponse:result],error,YES);
                                       }
-                                      
+
                                     }];
 
                                   }
 
                                 }];
-                                  
 
-  
+
+
 }
 
 //Refactor this fucking monster
@@ -149,7 +141,7 @@
                                                               parameters:nil];
                   request.account = account;
                   [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
-                    
+
                     if(error) completeBlock(((id<account>)account), nil, error, NO);
                     else {
                       NSMutableDictionary * authHash = [[NSJSONSerialization
@@ -167,13 +159,13 @@
                 else
                 completeBlock(((id<account>)account), nil, error, success);
               }];
-              
+
             }
             else {
               completeBlock(((id<account>)account), nil, error, NO);
             }
     }];
-  
+
 }
 
 +(NSMutableDictionary *)authHashWithResponse:(NSDictionary *)theResponse; {
@@ -187,14 +179,14 @@
     lastName = names[1];
   if(names.count > 2  && lastName == nil)
     lastName = names[names.count-1];
-  
-    
-    
+
+
+
   NSMutableDictionary * omniAuthHash = @{@"auth" :
                                   @{@"credentials" : @{@"secret" : NSNullIfNil(theResponse[@"oauth_token_secret"]),
                                                        @"token"  : NSNullIfNil(theResponse[@"token"])
                                                      }.mutableCopy,
-                                  
+
                                   @"info" : @{@"description"  : NSNullIfNil(theResponse[@"description"]),
                                               @"email"        : NSNullIfNil(theResponse[@"email"]),
                                               @"first_name"   : NSNullIfNil(firstName),
@@ -205,7 +197,7 @@
                                               @"name"         : NSNullIfNil(name),
                                               @"urls"         : @{@"public_profile" : NSNullIfNil(theResponse[@"link"])
                                                                   }.mutableCopy,
-                                              
+
                                               }.mutableCopy,
                                   @"provider" : @"facebook",
                                   @"uid"      : NSNullIfNil(theResponse[@"id"]),
@@ -213,10 +205,10 @@
                                     }.mutableCopy,
                                   @"email"    : NSNullIfNil(theResponse[@"email"]),
                                   }.mutableCopy;
-  
-  
+
+
   return omniAuthHash;
-  
+
 }
 
 
