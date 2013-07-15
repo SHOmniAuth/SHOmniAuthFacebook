@@ -34,7 +34,7 @@
 #define COCOAPODS_POD_AVAILABLE_SHOmniAuthFacebook
 #define COCOAPODS_VERSION_MAJOR_SHOmniAuthFacebook 0
 #define COCOAPODS_VERSION_MINOR_SHOmniAuthFacebook 2
-#define COCOAPODS_VERSION_PATCH_SHOmniAuthFacebook 0
+#define COCOAPODS_VERSION_PATCH_SHOmniAuthFacebook 1
 
 // libffi
 #define COCOAPODS_POD_AVAILABLE_libffi
