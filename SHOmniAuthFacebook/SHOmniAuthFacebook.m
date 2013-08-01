@@ -151,7 +151,7 @@
                       authHash[@"token"] = account.credential.oauthToken;
                       completeBlock(((id<account>)account),
                                     [self authHashWithResponse:authHash],
-                                    error, NO);
+                                    error, YES);
                     }
                   }];
 
