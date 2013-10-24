@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Facebook
+ * Copyright 2010-present Facebook.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
+#import "FBErrorUtility+Internal.h"
+
+#import "FBAccessTokenData+Internal.h"
 #import "FBError.h"
-#import "FBErrorUtility.h"
 #import "FBSession.h"
 #import "FBUtility.h"
-#import "FBAccessTokenData+Internal.h"
 
-static const int FBOAuthError = 190;
+const int FBOAuthError = 190;
 static const int FBAPISessionError = 102;
 static const int FBAPIServiceError = 2;
 static const int FBAPIUnknownError = 1;
@@ -34,6 +35,54 @@ static const int FBSDKSystemPasswordErrorSubcode = 65001;
 
 @implementation FBErrorUtility
 
++(FBErrorCategory) errorCategoryForError:(NSError *)error {
+    int code = 0, subcode = 0;
+
+    [FBErrorUtility fberrorGetCodeValueForError:error
+                                          index:0
+                                           code:&code
+                                        subcode:&subcode];
+
+    return [FBErrorUtility fberrorCategoryFromError:error
+                                               code:code
+                                            subcode:subcode
+                               returningUserMessage:nil
+                                andShouldNotifyUser:nil];
+}
+
++(BOOL) shouldNotifyUserForError:(NSError *)error {
+    BOOL shouldNotifyUser = NO;
+    int code = 0, subcode = 0;
+
+    [FBErrorUtility fberrorGetCodeValueForError:error
+                                          index:0
+                                           code:&code
+                                        subcode:&subcode];
+
+    [FBErrorUtility fberrorCategoryFromError:error
+                                        code:code
+                                     subcode:subcode
+                        returningUserMessage:nil
+                         andShouldNotifyUser:&shouldNotifyUser];
+    return shouldNotifyUser;
+}
+
++(NSString *) userMessageForError:(NSError *)error {
+    NSString *message = nil;
+    int code = 0, subcode = 0;
+    [FBErrorUtility fberrorGetCodeValueForError:error
+                                          index:0
+                                           code:&code
+                                        subcode:&subcode];
+
+    [FBErrorUtility fberrorCategoryFromError:error
+                                        code:code
+                                     subcode:subcode
+                        returningUserMessage:&message
+                         andShouldNotifyUser:nil];
+    return message;
+}
+
 // This method is responsible for error categorization and response policy for
 // the SDK; for example, the rules in this method dictate when an auth error is
 // categorized as *Retry vs *ReopenSession, which in turn impacts whether
@@ -45,15 +94,15 @@ static const int FBSDKSystemPasswordErrorSubcode = 65001;
                                    subcode:(int)subcode
                       returningUserMessage:(NSString **)puserMessage
                        andShouldNotifyUser:(BOOL *)pshouldNotifyUser {
-    
+
     NSString *userMessageKey = nil;
     NSString *userMessageDefault = nil;
-    
+
     BOOL shouldNotifyUser = NO;
-    
+
     // defaulting to a non-facebook category
     FBErrorCategory category = FBErrorCategoryInvalid;
-    
+
     // determine if we have a facebook error category here
     if ([[error domain] isEqualToString:FacebookSDKDomain]) {
         // now defaulting to an unknown (future) facebook category
@@ -83,7 +132,7 @@ static const int FBSDKSystemPasswordErrorSubcode = 65001;
             }
         }
     }
-    
+
     // determine details about category, user notification, and message
     switch (category) {
         case FBErrorCategoryAuthenticationReopenSession:
@@ -131,13 +180,13 @@ static const int FBSDKSystemPasswordErrorSubcode = 65001;
                         userMessageKey = @"FBE:OAuthDevice";
                         userMessageDefault = @"To use your Facebook account with this app, open Settings > Facebook and make sure this app is turned on.";
                         shouldNotifyUser = YES;
-                    } 
+                    }
                     break;
             }
             break;
         case FBErrorCategoryPermissions:
             userMessageKey = @"FBE:GrantPermission";
-            userMessageDefault = @"This app doesn’t have permission to do this. To change permissions, try logging into the app again.";
+            userMessageDefault = @"This app doesn't have permission to do this. To change permissions, try logging into the app again.";
             break;
         case FBErrorCategoryRetry:
             if ([error code] == FBErrorLoginFailedOrCancelled) {
@@ -169,11 +218,11 @@ static const int FBSDKSystemPasswordErrorSubcode = 65001;
             userMessageDefault = nil;
             break;
     }
-    
+
     if (pshouldNotifyUser) {
         *pshouldNotifyUser = shouldNotifyUser;
     }
-    
+
     if (puserMessage) {
         if (userMessageKey) {
             *puserMessage = [FBUtility localizedStringForKey:userMessageKey
@@ -192,10 +241,10 @@ static const int FBSDKSystemPasswordErrorSubcode = 65001;
 }
 
 + (void)fberrorGetCodeValueForError:(NSError *)error
-                              index:(int)index
+                              index:(NSUInteger)index
                                code:(int *)pcode
                             subcode:(int *)psubcode {
-    
+
     // does this error have a response? that is an array?
     id response = [error.userInfo objectForKey:FBErrorParsedJSONResponseKey];
     if (response) {

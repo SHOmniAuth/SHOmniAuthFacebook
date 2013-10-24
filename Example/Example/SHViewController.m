@@ -7,9 +7,10 @@
 //
 
 #import "SHViewController.h"
-#import "SHOmniAuthFacebook.h"
-#import "UIActionSheet+BlocksKit.h"
-#import "NSArray+BlocksKit.h"
+#import <SHOmniAuthFacebook.h>
+#import <SHActionSheetBlocks.h>
+#import <SHAlertViewBlocks.h>
+#import <NSArray+SHFastEnumerationProtocols.h>
 
 @interface SHViewController ()
 
@@ -19,9 +20,11 @@
 
 -(void)viewDidAppear:(BOOL)animated; {
   [super viewDidAppear:animated];
-  [SHOmniAuthFacebook performLoginWithListOfAccounts:^(NSArray *accounts, SHOmniAuthAccountPickerHandler pickAccountBlock) { UIActionSheet * actionSheet = [[UIActionSheet alloc] initWithTitle:@"Pick Facebook account"];
-    [accounts each:^(id<account> account) {
-      [actionSheet addButtonWithTitle:account.username handler:^{
+  [SHOmniAuthFacebook performLoginWithListOfAccounts:^(NSArray *accounts, SHOmniAuthAccountPickerHandler pickAccountBlock) {
+
+    UIActionSheet * actionSheet = [UIActionSheet SH_actionSheetWithTitle:@"Pick Facebook account"];
+    [accounts SH_each:^(id<account> account) {
+      [actionSheet SH_addButtonWithTitle:account.username withBlock:^(NSInteger theButtonIndex) {
         pickAccountBlock(account);
       }];
     }];
@@ -32,7 +35,7 @@
     else
       buttonTitle = @"Connect with Facebook";
     
-    [actionSheet addButtonWithTitle:buttonTitle handler:^{
+    [actionSheet SH_addButtonWithTitle:buttonTitle withBlock:^(NSInteger theButtonIndex) {
       pickAccountBlock(nil);
     }];
     
@@ -42,6 +45,7 @@
     
   } onComplete:^(id<account> account, id response, NSError *error, BOOL isSuccess) {
     NSLog(@"%@", response);
+    [[UIAlertView SH_alertViewWithTitle:nil andMessage:[response description] buttonTitles:nil cancelTitle:@"OK" withBlock:nil] show];
   }];
 }
 

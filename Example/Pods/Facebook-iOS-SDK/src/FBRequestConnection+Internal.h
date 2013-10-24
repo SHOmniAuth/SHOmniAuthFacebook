@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Facebook
+ * Copyright 2010-present Facebook.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,21 @@
  */
 
 #import "FBRequestConnection.h"
+#import "FBRequestMetadata.h"
+
+@class FBRequestConnectionRetryManager;
 
 @interface FBRequestConnection (Internal)
 
 @property (nonatomic, readonly) BOOL isResultFromCache;
+@property (nonatomic, readonly) NSMutableArray *requests;
+@property (nonatomic, readonly) FBRequestConnectionRetryManager *retryManager;
+
+- (id)initWithMetadata:(NSArray *)metadataArray;
 
 - (void)startWithCacheIdentity:(NSString*)cacheIdentity
          skipRoundtripIfCached:(BOOL)consultCache;
+
+- (FBRequestMetadata *) getRequestMetadata:(FBRequest *)request;
 
 @end

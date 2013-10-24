@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Facebook
+ * Copyright 2010-present Facebook.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 - (void)prefetchAndCacheForSession:(FBSession *)session {
     // we are treating this method as abstract virtual here
-    [self doesNotRecognizeSelector:_cmd];    
+    [self doesNotRecognizeSelector:_cmd];
 }
 
 @end
