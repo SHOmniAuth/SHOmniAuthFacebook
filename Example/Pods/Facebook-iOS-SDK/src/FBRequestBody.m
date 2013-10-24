@@ -1,12 +1,12 @@
 /*
- * Copyright 2012 Facebook
+ * Copyright 2010-present Facebook.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *    http://www.apache.org/licenses/LICENSE-2.0
- 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +15,8 @@
  */
 
 #import "FBRequestBody.h"
+
+#import "FBSettings+Internal.h"
 
 static NSString *kStringBoundary = @"3i2ndDfv2rTHiSisAbouNdArYfORhtTPEefj3q2f";
 
@@ -83,11 +85,11 @@ static NSString *kStringBoundary = @"3i2ndDfv2rTHiSisAbouNdArYfORhtTPEefj3q2f";
     NSString *disposition =
         [NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"; filename=\"%@\"\r\n", key, key];
     [self appendUTF8:disposition];
-    [self appendUTF8:@"Content-Type: image/png\r\n\r\n"];
-    NSData *data = UIImagePNGRepresentation(image);
+    [self appendUTF8:@"Content-Type: image/jpeg\r\n\r\n"];
+    NSData *data = UIImageJPEGRepresentation(image, [FBSettings defaultJPEGCompressionQuality]);
     [self.mutableData appendData:data];
     [self appendRecordBoundary];
-    [logger appendFormat:@"\n    %@:\t<Image - %d kB>", key, [data length] / 1024];
+    [logger appendFormat:@"\n    %@:\t<Image - %lu kB>", key, (unsigned long)([data length] / 1024)];
 }
 
 - (void)appendWithKey:(NSString *)key
@@ -100,7 +102,7 @@ static NSString *kStringBoundary = @"3i2ndDfv2rTHiSisAbouNdArYfORhtTPEefj3q2f";
     [self appendUTF8:@"Content-Type: content/unknown\r\n\r\n"];
     [self.mutableData appendData:data];
     [self appendRecordBoundary];
-    [logger appendFormat:@"\n    %@:\t<Data - %d kB>", key, [data length] / 1024];
+    [logger appendFormat:@"\n    %@:\t<Data - %lu kB>", key, (unsigned long)([data length] / 1024)];
 }
 
 - (NSData *)data
