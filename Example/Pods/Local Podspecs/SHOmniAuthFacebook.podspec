@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
   name         = "SHOmniAuthFacebook"
   url          = "https://github.com/SHOmniAuth/#{name}"
   git_url      = "#{url}.git"
-  version      = "0.2.2"
+  version      = "0.2.3"
   source_files = "#{name}/**/*.{h,m}"
 
   s.name         = name
@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
                     A strategy for authenticating with Facebook via SHOmniAuth.
                     Uses ACAccount for store and SLRequest for signed requests.
                    DESC
-  s.homepage     = "https://github.com/seivan/SHOmniAuthFacebook"
+  s.homepage     = url
 
   s.license      = 'MIT'
   s.author       = { "Seivan Heidari" => "seivan.heidari@icloud.com" }

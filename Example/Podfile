@@ -1,5 +1,6 @@
 platform :ios, '6.0' 
-#pod 'SHOmniAuth',	  :git => "http://github.com/seivan/SHOmniAuth", :branch => :develop
+link_with ['Example', 'Hacker']
+
 pod 'SHOmniAuthFacebook', :path => '../'
 pod 'SHActionSheetBlocks'
 pod 'SHAlertViewBlocks'
